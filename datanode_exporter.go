@@ -19,6 +19,7 @@ var (
 	listenAddress  = flag.String("unix-sock", "/dev/shm/hadoop_datanode_exporter.sock", "Address to listen on for unix sock access and telemetry.")
 	metricsPath    = flag.String("web.telemetry-path", "/metrics", "Path under which to expose metrics.")
 	dataNodeJmxUrl = flag.String("jmx.url", "http://localhost:50075/jmx", "Hadoop namenode JMX URL.")
+	role           = flag.String("role", "DataNode", "Role type.")
 )
 
 var g_doing bool
@@ -209,118 +210,118 @@ func doWork() {
 	ret := ""
 	nameSpace := "hadoop_datanode"
 
-	ret += fmt.Sprintf("%s_heap_memory{type=\"committed\"} %g\n",
-		nameSpace, s.HeapMemoryUsageCommitted)
-	ret += fmt.Sprintf("%s_heap_memory{type=\"init\"} %g\n",
-		nameSpace, s.HeapMemoryUsageInit)
-	ret += fmt.Sprintf("%s_heap_memory{type=\"max\"} %g\n",
-		nameSpace, s.HeapMemoryUsageMax)
-	ret += fmt.Sprintf("%s_heap_memory{type=\"used\"} %g\n",
-		nameSpace, s.HeapMemoryUsageUsed)
+	ret += fmt.Sprintf("%s_heap_memory{type=\"committed\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.HeapMemoryUsageCommitted)
+	ret += fmt.Sprintf("%s_heap_memory{type=\"init\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.HeapMemoryUsageInit)
+	ret += fmt.Sprintf("%s_heap_memory{type=\"max\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.HeapMemoryUsageMax)
+	ret += fmt.Sprintf("%s_heap_memory{type=\"used\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.HeapMemoryUsageUsed)
 
 
-	ret += fmt.Sprintf("%s_bytes_written %g\n",
-		nameSpace, s.BytesWritten)
-	ret += fmt.Sprintf("%s_bytes_read %g\n",
-		nameSpace, s.BytesRead)
+	ret += fmt.Sprintf("%s_bytes_written{role=\"%s\"} %g\n",
+		nameSpace, *role, s.BytesWritten)
+	ret += fmt.Sprintf("%s_bytes_read{role=\"%s\"} %g\n",
+		nameSpace, *role, s.BytesRead)
 
-	ret += fmt.Sprintf("%s_blocks_written %g\n",
-		nameSpace, s.BlocksWritten)
-	ret += fmt.Sprintf("%s_blocks_read %g\n",
-		nameSpace, s.BlocksRead)
-	ret += fmt.Sprintf("%s_blocks_replicated %g\n",
-		nameSpace, s.BlocksReplicated)
-	ret += fmt.Sprintf("%s_blocks_removed %g\n",
-		nameSpace, s.BlocksRemoved)
-	ret += fmt.Sprintf("%s_blocks_verified %g\n",
-		nameSpace, s.BlocksVerified)
-	ret += fmt.Sprintf("%s_block_verification_failures %g\n",
-		nameSpace, s.BlockVerificationFailures)
+	ret += fmt.Sprintf("%s_blocks_written{role=\"%s\"} %g\n",
+		nameSpace, *role, s.BlocksWritten)
+	ret += fmt.Sprintf("%s_blocks_read{role=\"%s\"} %g\n",
+		nameSpace, *role, s.BlocksRead)
+	ret += fmt.Sprintf("%s_blocks_replicated{role=\"%s\"} %g\n",
+		nameSpace, *role, s.BlocksReplicated)
+	ret += fmt.Sprintf("%s_blocks_removed{role=\"%s\"} %g\n",
+		nameSpace, *role, s.BlocksRemoved)
+	ret += fmt.Sprintf("%s_blocks_verified{role=\"%s\"} %g\n",
+		nameSpace, *role, s.BlocksVerified)
+	ret += fmt.Sprintf("%s_block_verification_failures{role=\"%s\"} %g\n",
+		nameSpace, *role, s.BlockVerificationFailures)
 
-	ret += fmt.Sprintf("%s_reads_from_local_client %g\n",
-		nameSpace, s.ReadsFromLocalClient)
-	ret += fmt.Sprintf("%s_reads_from_remote_client %g\n",
-		nameSpace, s.ReadsFromRemoteClient)
-	ret += fmt.Sprintf("%s_writes_from_local_client %g\n",
-		nameSpace, s.WritesFromLocalClient)
-	ret += fmt.Sprintf("%s_writes_from_remote_client %g\n",
-		nameSpace, s.WritesFromRemoteClient)
+	ret += fmt.Sprintf("%s_reads_from_local_client{role=\"%s\"} %g\n",
+		nameSpace, *role, s.ReadsFromLocalClient)
+	ret += fmt.Sprintf("%s_reads_from_remote_client{role=\"%s\"} %g\n",
+		nameSpace, *role, s.ReadsFromRemoteClient)
+	ret += fmt.Sprintf("%s_writes_from_local_client{role=\"%s\"} %g\n",
+		nameSpace, *role, s.WritesFromLocalClient)
+	ret += fmt.Sprintf("%s_writes_from_remote_client{role=\"%s\"} %g\n",
+		nameSpace, *role, s.WritesFromRemoteClient)
 
-	ret += fmt.Sprintf("%s_blocks_get_local_path_info %g\n",
-		nameSpace, s.BlocksGetLocalPathInfo)
-	ret += fmt.Sprintf("%s_fsync_count %g\n",
-		nameSpace, s.FsyncCount)
-	ret += fmt.Sprintf("%s_volume_failures %g\n",
-		nameSpace, s.VolumeFailures)
+	ret += fmt.Sprintf("%s_blocks_get_local_path_info{role=\"%s\"} %g\n",
+		nameSpace, *role, s.BlocksGetLocalPathInfo)
+	ret += fmt.Sprintf("%s_fsync_count{role=\"%s\"} %g\n",
+		nameSpace, *role, s.FsyncCount)
+	ret += fmt.Sprintf("%s_volume_failures{role=\"%s\"} %g\n",
+		nameSpace, *role, s.VolumeFailures)
 
-	ret += fmt.Sprintf("%s_read_block_op_uum_ops %g\n",
-		nameSpace, s.ReadBlockOpNumOps)
-	ret += fmt.Sprintf("%s_read_block_op_avg_time %g\n",
-		nameSpace, s.ReadBlockOpAvgTime)
-	ret += fmt.Sprintf("%s_write_block_op_uum_ops %g\n",
-		nameSpace, s.WriteBlockOpNumOps)
-	ret += fmt.Sprintf("%s_write_block_op_avg_time %g\n",
-		nameSpace, s.WriteBlockOpAvgTime)
-	ret += fmt.Sprintf("%s_block_checksum_op_num_ops %g\n",
-		nameSpace, s.BlockChecksumOpNumOps)
-	ret += fmt.Sprintf("%s_block_checksum_op_vvg_time %g\n",
-		nameSpace, s.BlockChecksumOpAvgTime)
-	ret += fmt.Sprintf("%s_copy_block_op_num_ops %g\n",
-		nameSpace, s.CopyBlockOpNumOps)
-	ret += fmt.Sprintf("%s_copy_block_op_avg_time %g\n",
-		nameSpace, s.CopyBlockOpAvgTime)
-	ret += fmt.Sprintf("%s_replace_block_op_num_ops %g\n",
-		nameSpace, s.ReplaceBlockOpNumOps)
-	ret += fmt.Sprintf("%s_replace_block_op_avg_time %g\n",
-		nameSpace, s.ReplaceBlockOpAvgTime)
+	ret += fmt.Sprintf("%s_read_block_op_uum_ops{role=\"%s\"} %g\n",
+		nameSpace, *role, s.ReadBlockOpNumOps)
+	ret += fmt.Sprintf("%s_read_block_op_avg_time{role=\"%s\"} %g\n",
+		nameSpace, *role, s.ReadBlockOpAvgTime)
+	ret += fmt.Sprintf("%s_write_block_op_uum_ops{role=\"%s\"} %g\n",
+		nameSpace, *role, s.WriteBlockOpNumOps)
+	ret += fmt.Sprintf("%s_write_block_op_avg_time{role=\"%s\"} %g\n",
+		nameSpace, *role, s.WriteBlockOpAvgTime)
+	ret += fmt.Sprintf("%s_block_checksum_op_num_ops{role=\"%s\"} %g\n",
+		nameSpace, *role, s.BlockChecksumOpNumOps)
+	ret += fmt.Sprintf("%s_block_checksum_op_vvg_time{role=\"%s\"} %g\n",
+		nameSpace, *role, s.BlockChecksumOpAvgTime)
+	ret += fmt.Sprintf("%s_copy_block_op_num_ops{role=\"%s\"} %g\n",
+		nameSpace, *role, s.CopyBlockOpNumOps)
+	ret += fmt.Sprintf("%s_copy_block_op_avg_time{role=\"%s\"} %g\n",
+		nameSpace, *role, s.CopyBlockOpAvgTime)
+	ret += fmt.Sprintf("%s_replace_block_op_num_ops{role=\"%s\"} %g\n",
+		nameSpace, *role, s.ReplaceBlockOpNumOps)
+	ret += fmt.Sprintf("%s_replace_block_op_avg_time{role=\"%s\"} %g\n",
+		nameSpace, *role, s.ReplaceBlockOpAvgTime)
 
-	ret += fmt.Sprintf("%s_heartbeats_num_ops %g\n",
-		nameSpace, s.HeartbeatsNumOps)
-	ret += fmt.Sprintf("%s_heartbeats_avg_time %g\n",
-		nameSpace, s.HeartbeatsAvgTime)
+	ret += fmt.Sprintf("%s_heartbeats_num_ops{role=\"%s\"} %g\n",
+		nameSpace, *role, s.HeartbeatsNumOps)
+	ret += fmt.Sprintf("%s_heartbeats_avg_time{role=\"%s\"} %g\n",
+		nameSpace, *role, s.HeartbeatsAvgTime)
 
-	ret += fmt.Sprintf("%s_block_reports_num_ops %g\n",
-		nameSpace, s.BlockReportsNumOps)
-	ret += fmt.Sprintf("%s_block_reports_avg_time %g\n",
-		nameSpace, s.BlockReportsAvgTime)
+	ret += fmt.Sprintf("%s_block_reports_num_ops{role=\"%s\"} %g\n",
+		nameSpace, *role, s.BlockReportsNumOps)
+	ret += fmt.Sprintf("%s_block_reports_avg_time{role=\"%s\"} %g\n",
+		nameSpace, *role, s.BlockReportsAvgTime)
 
-	ret += fmt.Sprintf("%s_packet_ack_roundtrip_time_nanos_num_ops %g\n",
-		nameSpace, s.PacketAckRoundTripTimeNanosNumOps)
-	ret += fmt.Sprintf("%s_packet_ack_roundtrip_time_nanos_avg_time %g\n",
-		nameSpace, s.PacketAckRoundTripTimeNanosAvgTime)
+	ret += fmt.Sprintf("%s_packet_ack_roundtrip_time_nanos_num_ops{role=\"%s\"} %g\n",
+		nameSpace, *role, s.PacketAckRoundTripTimeNanosNumOps)
+	ret += fmt.Sprintf("%s_packet_ack_roundtrip_time_nanos_avg_time{role=\"%s\"} %g\n",
+		nameSpace, *role, s.PacketAckRoundTripTimeNanosAvgTime)
 
-	ret += fmt.Sprintf("%s_flush_nanos_num_ops %g\n",
-		nameSpace, s.FlushNanosNumOps)
-	ret += fmt.Sprintf("%s_flush_nanos_avg_time %g\n",
-		nameSpace, s.FlushNanosAvgTime)
-	ret += fmt.Sprintf("%s_fsync_nanos_num_ops %g\n",
-		nameSpace, s.FsyncNanosNumOps)
-	ret += fmt.Sprintf("%s_fsync_nanos_avg_time %g\n",
-		nameSpace, s.FsyncNanosAvgTime)
+	ret += fmt.Sprintf("%s_flush_nanos_num_ops{role=\"%s\"} %g\n",
+		nameSpace, *role, s.FlushNanosNumOps)
+	ret += fmt.Sprintf("%s_flush_nanos_avg_time{role=\"%s\"} %g\n",
+		nameSpace, *role, s.FlushNanosAvgTime)
+	ret += fmt.Sprintf("%s_fsync_nanos_num_ops{role=\"%s\"} %g\n",
+		nameSpace, *role, s.FsyncNanosNumOps)
+	ret += fmt.Sprintf("%s_fsync_nanos_avg_time{role=\"%s\"} %g\n",
+		nameSpace, *role, s.FsyncNanosAvgTime)
 
-	ret += fmt.Sprintf("%s_senddata_packet_blocked_on_network_nanos_num_ops %g\n",
-		nameSpace, s.SendDataPacketBlockedOnNetworkNanosNumOps)
-	ret += fmt.Sprintf("%s_senddata_packet_blocked_on_network_nanos_avg_time %g\n",
-		nameSpace, s.SendDataPacketBlockedOnNetworkNanosAvgTime)
-	ret += fmt.Sprintf("%s_senddata_packet_transfer_nanos_num_ops %g\n",
-		nameSpace, s.SendDataPacketTransferNanosNumOps)
-	ret += fmt.Sprintf("%s_senddata_packet_transfer_nanos_avg_time %g\n",
-		nameSpace, s.SendDataPacketTransferNanosAvgTime)
+	ret += fmt.Sprintf("%s_senddata_packet_blocked_on_network_nanos_num_ops{role=\"%s\"} %g\n",
+		nameSpace, *role, s.SendDataPacketBlockedOnNetworkNanosNumOps)
+	ret += fmt.Sprintf("%s_senddata_packet_blocked_on_network_nanos_avg_time{role=\"%s\"} %g\n",
+		nameSpace, *role, s.SendDataPacketBlockedOnNetworkNanosAvgTime)
+	ret += fmt.Sprintf("%s_senddata_packet_transfer_nanos_num_ops{role=\"%s\"} %g\n",
+		nameSpace, *role, s.SendDataPacketTransferNanosNumOps)
+	ret += fmt.Sprintf("%s_senddata_packet_transfer_nanos_avg_time{role=\"%s\"} %g\n",
+		nameSpace, *role, s.SendDataPacketTransferNanosAvgTime)
 
 
 
-	ret += fmt.Sprintf("%s_jvm_metrics_gc_time_total_millis %g\n",
-		nameSpace, s.GcTimeMillis)
-	ret += fmt.Sprintf("%s_jvm_metrics_gc_time_millis{type=\"par_new\"} %g\n",
-		nameSpace, s.GcTimeMillisParNew)
-	ret += fmt.Sprintf("%s_jvm_metrics_gc_time_millis{type=\"concurrent_mark_sweep\"} %g\n",
-		nameSpace, s.GcTimeMillisConcurrentMarkSweep)
-	ret += fmt.Sprintf("%s_jvm_metrics_gc_count_total %g\n",
-		nameSpace, s.GcCount)
-	ret += fmt.Sprintf("%s_jvm_metrics_gc_count{type=\"par_new\"} %g\n",
-		nameSpace, s.GcCountParNew)
-	ret += fmt.Sprintf("%s_jvm_metrics_gc_count{type=\"concurrent_mark_sweep\"} %g\n",
-		nameSpace, s.GcCountConcurrentMarkSweep)
+	ret += fmt.Sprintf("%s_jvm_metrics_gc_time_total_millis{role=\"%s\"} %g\n",
+		nameSpace, *role, s.GcTimeMillis)
+	ret += fmt.Sprintf("%s_jvm_metrics_gc_time_millis{type=\"par_new\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.GcTimeMillisParNew)
+	ret += fmt.Sprintf("%s_jvm_metrics_gc_time_millis{type=\"concurrent_mark_sweep\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.GcTimeMillisConcurrentMarkSweep)
+	ret += fmt.Sprintf("%s_jvm_metrics_gc_count_total{role=\"%s\"} %g\n",
+		nameSpace, *role, s.GcCount)
+	ret += fmt.Sprintf("%s_jvm_metrics_gc_count{type=\"par_new\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.GcCountParNew)
+	ret += fmt.Sprintf("%s_jvm_metrics_gc_count{type=\"concurrent_mark_sweep\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.GcCountConcurrentMarkSweep)
 
 
 	g_lock.Lock()

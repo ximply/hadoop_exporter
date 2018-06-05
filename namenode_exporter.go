@@ -19,6 +19,7 @@ var (
 	listenAddress  = flag.String("unix-sock", "/dev/shm/hadoop_namenode_exporter.sock", "Address to listen on for unix sock access and telemetry.")
 	metricsPath    = flag.String("web.telemetry-path", "/metrics", "Path under which to expose metrics.")
 	nameNodeJmxUrl = flag.String("jmx.url", "http://localhost:50070/jmx", "Hadoop namenode JMX URL.")
+	role           = flag.String("role", "NameNode", "Role type.")
 )
 
 var g_doing bool
@@ -244,143 +245,143 @@ func doWork() {
 	nameSpace := "hadoop_namenode"
 
 	// Memory
-	ret += fmt.Sprintf("%s_heap_memory{type=\"committed\"} %g\n",
-		nameSpace, s.MemoryInfo.heapMemoryUsageCommitted)
-	ret += fmt.Sprintf("%s_heap_memory{type=\"init\"} %g\n",
-		nameSpace, s.MemoryInfo.heapMemoryUsageInit)
-	ret += fmt.Sprintf("%s_heap_memory{type=\"max\"} %g\n",
-		nameSpace, s.MemoryInfo.heapMemoryUsageMax)
-	ret += fmt.Sprintf("%s_heap_memory{type=\"used\"} %g\n",
-		nameSpace, s.MemoryInfo.heapMemoryUsageUsed)
+	ret += fmt.Sprintf("%s_heap_memory{type=\"committed\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.MemoryInfo.heapMemoryUsageCommitted)
+	ret += fmt.Sprintf("%s_heap_memory{type=\"init\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.MemoryInfo.heapMemoryUsageInit)
+	ret += fmt.Sprintf("%s_heap_memory{type=\"max\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.MemoryInfo.heapMemoryUsageMax)
+	ret += fmt.Sprintf("%s_heap_memory{type=\"used\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.MemoryInfo.heapMemoryUsageUsed)
 
 	// FSNamesystem
-	ret += fmt.Sprintf("%s_fs_name_system_blocks{type=\"missing\"} %g\n",
-		nameSpace, s.FSNamesystemInfo.MissingBlocks)
-	ret += fmt.Sprintf("%s_fs_name_system_blocks{type=\"total\"} %g\n",
-		nameSpace, s.FSNamesystemInfo.BlocksTotal)
-	ret += fmt.Sprintf("%s_fs_name_system_blocks{type=\"corrupt\"} %g\n",
-		nameSpace, s.FSNamesystemInfo.CorruptBlocks)
-	ret += fmt.Sprintf("%s_fs_name_system_blocks{type=\"excess\"} %g\n",
-		nameSpace, s.FSNamesystemInfo.ExcessBlocks)
-	ret += fmt.Sprintf("%s_fs_name_system_blocks{type=\"pending_repl\"} %g\n",
-		nameSpace, s.FSNamesystemInfo.PendingReplicationBlocks)
-	ret += fmt.Sprintf("%s_fs_name_system_blocks{type=\"scheduled_repl\"} %g\n",
-		nameSpace, s.FSNamesystemInfo.ScheduledReplicationBlocks)
-	ret += fmt.Sprintf("%s_fs_name_system_capacity{type=\"total\"} %g\n",
-		nameSpace, s.FSNamesystemInfo.CapacityTotalGB)
-	ret += fmt.Sprintf("%s_fs_name_system_capacity{type=\"used\"} %g\n",
-		nameSpace, s.FSNamesystemInfo.CapacityUsedGB)
-	ret += fmt.Sprintf("%s_fs_name_system_capacity{type=\"remaining\"} %g\n",
-		nameSpace, s.FSNamesystemInfo.CapacityRemainingGB)
-	ret += fmt.Sprintf("%s_fs_name_system_files_total %g\n",
-		nameSpace, s.FSNamesystemInfo.FilesTotal)
-	ret += fmt.Sprintf("%s_fs_name_system_total_load %g\n",
-		nameSpace, s.FSNamesystemInfo.TotalLoad)
+	ret += fmt.Sprintf("%s_fs_name_system_blocks{type=\"missing\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.FSNamesystemInfo.MissingBlocks)
+	ret += fmt.Sprintf("%s_fs_name_system_blocks{type=\"total\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.FSNamesystemInfo.BlocksTotal)
+	ret += fmt.Sprintf("%s_fs_name_system_blocks{type=\"corrupt\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.FSNamesystemInfo.CorruptBlocks)
+	ret += fmt.Sprintf("%s_fs_name_system_blocks{type=\"excess\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.FSNamesystemInfo.ExcessBlocks)
+	ret += fmt.Sprintf("%s_fs_name_system_blocks{type=\"pending_repl\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.FSNamesystemInfo.PendingReplicationBlocks)
+	ret += fmt.Sprintf("%s_fs_name_system_blocks{type=\"scheduled_repl\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.FSNamesystemInfo.ScheduledReplicationBlocks)
+	ret += fmt.Sprintf("%s_fs_name_system_capacity{type=\"total\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.FSNamesystemInfo.CapacityTotalGB)
+	ret += fmt.Sprintf("%s_fs_name_system_capacity{type=\"used\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.FSNamesystemInfo.CapacityUsedGB)
+	ret += fmt.Sprintf("%s_fs_name_system_capacity{type=\"remaining\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.FSNamesystemInfo.CapacityRemainingGB)
+	ret += fmt.Sprintf("%s_fs_name_system_files_total{role=\"%s\"} %g\n",
+		nameSpace, *role, s.FSNamesystemInfo.FilesTotal)
+	ret += fmt.Sprintf("%s_fs_name_system_total_load{role=\"%s\"} %g\n",
+		nameSpace, *role, s.FSNamesystemInfo.TotalLoad)
 
 	// FSNamesystemState
-	ret += fmt.Sprintf("%s_fs_name_system_state_capacity{type=\"total\"} %g\n",
-		nameSpace, s.FSNamesystemStateInfo.CapacityTotal)
-	ret += fmt.Sprintf("%s_fs_name_system_state_capacity{type=\"used\"} %g\n",
-		nameSpace, s.FSNamesystemStateInfo.CapacityUsed)
-	ret += fmt.Sprintf("%s_fs_name_system_state_capacity{type=\"remaining\"} %g\n",
-		nameSpace, s.FSNamesystemStateInfo.CapacityRemaining)
-	ret += fmt.Sprintf("%s_fs_name_system_state_total_load %g\n",
-		nameSpace, s.FSNamesystemStateInfo.TotalLoad)
-	ret += fmt.Sprintf("%s_fs_name_system_state_blocks_total %g\n",
-		nameSpace, s.FSNamesystemStateInfo.BlocksTotal)
-	ret += fmt.Sprintf("%s_fs_name_system_state_files_total %g\n",
-		nameSpace, s.FSNamesystemStateInfo.FilesTotal)
-	ret += fmt.Sprintf("%s_fs_name_system_state_pending_replication_blocks %g\n",
-		nameSpace, s.FSNamesystemStateInfo.PendingReplicationBlocks)
-	ret += fmt.Sprintf("%s_fs_name_system_state_under_replicated_blocks %g\n",
-		nameSpace, s.FSNamesystemStateInfo.UnderReplicatedBlocks)
-	ret += fmt.Sprintf("%s_fs_name_system_state_scheduled_replication_blocks %g\n",
-		nameSpace, s.FSNamesystemStateInfo.ScheduledReplicationBlocks)
-	ret += fmt.Sprintf("%s_fs_name_system_state_num_live_datanodes %g\n",
-		nameSpace, s.FSNamesystemStateInfo.NumLiveDataNodes)
-	ret += fmt.Sprintf("%s_fs_name_system_state_num_dead_datanodes %g\n",
-		nameSpace, s.FSNamesystemStateInfo.NumDeadDataNodes)
+	ret += fmt.Sprintf("%s_fs_name_system_state_capacity{type=\"total\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.FSNamesystemStateInfo.CapacityTotal)
+	ret += fmt.Sprintf("%s_fs_name_system_state_capacity{type=\"used\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.FSNamesystemStateInfo.CapacityUsed)
+	ret += fmt.Sprintf("%s_fs_name_system_state_capacity{type=\"remaining\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.FSNamesystemStateInfo.CapacityRemaining)
+	ret += fmt.Sprintf("%s_fs_name_system_state_total_load{role=\"%s\"} %g\n",
+		nameSpace, *role, s.FSNamesystemStateInfo.TotalLoad)
+	ret += fmt.Sprintf("%s_fs_name_system_state_blocks_total{role=\"%s\"} %g\n",
+		nameSpace, *role, s.FSNamesystemStateInfo.BlocksTotal)
+	ret += fmt.Sprintf("%s_fs_name_system_state_files_total{role=\"%s\"} %g\n",
+		nameSpace, *role, s.FSNamesystemStateInfo.FilesTotal)
+	ret += fmt.Sprintf("%s_fs_name_system_state_pending_replication_blocks{role=\"%s\"} %g\n",
+		nameSpace, *role, s.FSNamesystemStateInfo.PendingReplicationBlocks)
+	ret += fmt.Sprintf("%s_fs_name_system_state_under_replicated_blocks{role=\"%s\"} %g\n",
+		nameSpace, *role, s.FSNamesystemStateInfo.UnderReplicatedBlocks)
+	ret += fmt.Sprintf("%s_fs_name_system_state_scheduled_replication_blocks{role=\"%s\"} %g\n",
+		nameSpace, *role, s.FSNamesystemStateInfo.ScheduledReplicationBlocks)
+	ret += fmt.Sprintf("%s_fs_name_system_state_num_live_datanodes{role=\"%s\"} %g\n",
+		nameSpace, *role, s.FSNamesystemStateInfo.NumLiveDataNodes)
+	ret += fmt.Sprintf("%s_fs_name_system_state_num_dead_datanodes{role=\"%s\"} %g\n",
+		nameSpace, *role, s.FSNamesystemStateInfo.NumDeadDataNodes)
 
 	// NameNodeActivity
-	ret += fmt.Sprintf("%s_activity_create_file_ops %g\n",
-		nameSpace, s.NameNodeActivityInfo.CreateFileOps)
-	ret += fmt.Sprintf("%s_activity_file_created %g\n",
-		nameSpace, s.NameNodeActivityInfo.FilesCreated)
-	ret += fmt.Sprintf("%s_activity_create_file_ops %g\n",
-		nameSpace, s.NameNodeActivityInfo.CreateFileOps)
-	ret += fmt.Sprintf("%s_activity_get_block_locations %g\n",
-		nameSpace, s.NameNodeActivityInfo.GetBlockLocations)
-	ret += fmt.Sprintf("%s_activity_files_renamed %g\n",
-		nameSpace, s.NameNodeActivityInfo.FilesRenamed)
-	ret += fmt.Sprintf("%s_activity_get_listing_ops %g\n",
-		nameSpace, s.NameNodeActivityInfo.GetListingOps)
-	ret += fmt.Sprintf("%s_activity_get_delete_file_ops %g\n",
-		nameSpace, s.NameNodeActivityInfo.DeleteFileOps)
-	ret += fmt.Sprintf("%s_activity_get_files_deleted %g\n",
-		nameSpace, s.NameNodeActivityInfo.FilesDeleted)
-	ret += fmt.Sprintf("%s_activity_file_info_ops %g\n",
-		nameSpace, s.NameNodeActivityInfo.FileInfoOps)
+	ret += fmt.Sprintf("%s_activity_create_file_ops{role=\"%s\"} %g\n",
+		nameSpace, *role, s.NameNodeActivityInfo.CreateFileOps)
+	ret += fmt.Sprintf("%s_activity_file_created{role=\"%s\"} %g\n",
+		nameSpace, *role, s.NameNodeActivityInfo.FilesCreated)
+	ret += fmt.Sprintf("%s_activity_create_file_ops{role=\"%s\"} %g\n",
+		nameSpace, *role, s.NameNodeActivityInfo.CreateFileOps)
+	ret += fmt.Sprintf("%s_activity_get_block_locations{role=\"%s\"} %g\n",
+		nameSpace, *role, s.NameNodeActivityInfo.GetBlockLocations)
+	ret += fmt.Sprintf("%s_activity_files_renamed{role=\"%s\"} %g\n",
+		nameSpace, *role, s.NameNodeActivityInfo.FilesRenamed)
+	ret += fmt.Sprintf("%s_activity_get_listing_ops{role=\"%s\"} %g\n",
+		nameSpace, *role, s.NameNodeActivityInfo.GetListingOps)
+	ret += fmt.Sprintf("%s_activity_get_delete_file_ops{role=\"%s\"} %g\n",
+		nameSpace, *role, s.NameNodeActivityInfo.DeleteFileOps)
+	ret += fmt.Sprintf("%s_activity_get_files_deleted{role=\"%s\"} %g\n",
+		nameSpace, *role, s.NameNodeActivityInfo.FilesDeleted)
+	ret += fmt.Sprintf("%s_activity_file_info_ops{role=\"%s\"} %g\n",
+		nameSpace, *role, s.NameNodeActivityInfo.FileInfoOps)
 
-	ret += fmt.Sprintf("%s_activity_block_add_ops %g\n",
-		nameSpace, s.NameNodeActivityInfo.AddBlockOps)
-	ret += fmt.Sprintf("%s_activity_get_additional_datanode_ops %g\n",
-		nameSpace, s.NameNodeActivityInfo.GetAdditionalDatanodeOps)
-	ret += fmt.Sprintf("%s_activity_create_symlink_ops %g\n",
-		nameSpace, s.NameNodeActivityInfo.CreateSymlinkOps)
-	ret += fmt.Sprintf("%s_activity_get_link_target_ops %g\n",
-		nameSpace, s.NameNodeActivityInfo.GetLinkTargetOps)
-	ret += fmt.Sprintf("%s_activity_files_in_get_listing_ops %g\n",
-		nameSpace, s.NameNodeActivityInfo.FilesInGetListingOps)
-	ret += fmt.Sprintf("%s_activity_storage_block_report_ops %g\n",
-		nameSpace, s.NameNodeActivityInfo.StorageBlockReportOps)
-	ret += fmt.Sprintf("%s_activity_transactions_num_ops %g\n",
-		nameSpace, s.NameNodeActivityInfo.TransactionsNumOps)
-	ret += fmt.Sprintf("%s_activity_transactions_avg_time %g\n",
-		nameSpace, s.NameNodeActivityInfo.TransactionsAvgTime)
+	ret += fmt.Sprintf("%s_activity_block_add_ops{role=\"%s\"} %g\n",
+		nameSpace, *role, s.NameNodeActivityInfo.AddBlockOps)
+	ret += fmt.Sprintf("%s_activity_get_additional_datanode_ops{role=\"%s\"} %g\n",
+		nameSpace, *role, s.NameNodeActivityInfo.GetAdditionalDatanodeOps)
+	ret += fmt.Sprintf("%s_activity_create_symlink_ops{role=\"%s\"} %g\n",
+		nameSpace, *role, s.NameNodeActivityInfo.CreateSymlinkOps)
+	ret += fmt.Sprintf("%s_activity_get_link_target_ops{role=\"%s\"} %g\n",
+		nameSpace, *role, s.NameNodeActivityInfo.GetLinkTargetOps)
+	ret += fmt.Sprintf("%s_activity_files_in_get_listing_ops{role=\"%s\"} %g\n",
+		nameSpace, *role, s.NameNodeActivityInfo.FilesInGetListingOps)
+	ret += fmt.Sprintf("%s_activity_storage_block_report_ops{role=\"%s\"} %g\n",
+		nameSpace, *role, s.NameNodeActivityInfo.StorageBlockReportOps)
+	ret += fmt.Sprintf("%s_activity_transactions_num_ops{role=\"%s\"} %g\n",
+		nameSpace, *role, s.NameNodeActivityInfo.TransactionsNumOps)
+	ret += fmt.Sprintf("%s_activity_transactions_avg_time{role=\"%s\"} %g\n",
+		nameSpace, *role, s.NameNodeActivityInfo.TransactionsAvgTime)
 
-	ret += fmt.Sprintf("%s_activity_syncs_num_ops %g\n",
-		nameSpace, s.NameNodeActivityInfo.SyncsNumOps)
-	ret += fmt.Sprintf("%s_activity_syncs_avg_time %g\n",
-		nameSpace, s.NameNodeActivityInfo.SyncsAvgTime)
-	ret += fmt.Sprintf("%s_activity_transactions_batched_in_sync %g\n",
-		nameSpace, s.NameNodeActivityInfo.TransactionsBatchedInSync)
-	ret += fmt.Sprintf("%s_activity_block_report_num_ops %g\n",
-		nameSpace, s.NameNodeActivityInfo.BlockReportNumOps)
-	ret += fmt.Sprintf("%s_activity_block_report_avg_time %g\n",
-		nameSpace, s.NameNodeActivityInfo.BlockReportAvgTime)
-	ret += fmt.Sprintf("%s_activity_safemode_time %g\n",
-		nameSpace, s.NameNodeActivityInfo.SafeModeTime)
-	ret += fmt.Sprintf("%s_activity_fs_image_load_time %g\n",
-		nameSpace, s.NameNodeActivityInfo.FsImageLoadTime)
+	ret += fmt.Sprintf("%s_activity_syncs_num_ops{role=\"%s\"} %g\n",
+		nameSpace, *role, s.NameNodeActivityInfo.SyncsNumOps)
+	ret += fmt.Sprintf("%s_activity_syncs_avg_time{role=\"%s\"} %g\n",
+		nameSpace, *role, s.NameNodeActivityInfo.SyncsAvgTime)
+	ret += fmt.Sprintf("%s_activity_transactions_batched_in_sync{role=\"%s\"} %g\n",
+		nameSpace, *role, s.NameNodeActivityInfo.TransactionsBatchedInSync)
+	ret += fmt.Sprintf("%s_activity_block_report_num_ops{role=\"%s\"} %g\n",
+		nameSpace, *role, s.NameNodeActivityInfo.BlockReportNumOps)
+	ret += fmt.Sprintf("%s_activity_block_report_avg_time{role=\"%s\"} %g\n",
+		nameSpace, *role, s.NameNodeActivityInfo.BlockReportAvgTime)
+	ret += fmt.Sprintf("%s_activity_safemode_time{role=\"%s\"} %g\n",
+		nameSpace, *role, s.NameNodeActivityInfo.SafeModeTime)
+	ret += fmt.Sprintf("%s_activity_fs_image_load_time{role=\"%s\"} %g\n",
+		nameSpace, *role, s.NameNodeActivityInfo.FsImageLoadTime)
 
-	ret += fmt.Sprintf("%s_activity_get_edit_num_ops %g\n",
-		nameSpace, s.NameNodeActivityInfo.GetEditNumOps)
-	ret += fmt.Sprintf("%s_activity_get_edit_avg_time %g\n",
-		nameSpace, s.NameNodeActivityInfo.GetEditAvgTime)
-	ret += fmt.Sprintf("%s_activity_get_image_num_ops %g\n",
-		nameSpace, s.NameNodeActivityInfo.GetImageNumOps)
-	ret += fmt.Sprintf("%s_activity_get_image_avg_time %g\n",
-		nameSpace, s.NameNodeActivityInfo.GetImageAvgTime)
-	ret += fmt.Sprintf("%s_activity_put_image_num_ops %g\n",
-		nameSpace, s.NameNodeActivityInfo.PutImageNumOps)
-	ret += fmt.Sprintf("%s_activity_put_image_avg_time %g\n",
-		nameSpace, s.NameNodeActivityInfo.PutImageAvgTime)
+	ret += fmt.Sprintf("%s_activity_get_edit_num_ops{role=\"%s\"} %g\n",
+		nameSpace, *role, s.NameNodeActivityInfo.GetEditNumOps)
+	ret += fmt.Sprintf("%s_activity_get_edit_avg_time{role=\"%s\"} %g\n",
+		nameSpace, *role, s.NameNodeActivityInfo.GetEditAvgTime)
+	ret += fmt.Sprintf("%s_activity_get_image_num_ops{role=\"%s\"} %g\n",
+		nameSpace, *role, s.NameNodeActivityInfo.GetImageNumOps)
+	ret += fmt.Sprintf("%s_activity_get_image_avg_time{role=\"%s\"} %g\n",
+		nameSpace, *role, s.NameNodeActivityInfo.GetImageAvgTime)
+	ret += fmt.Sprintf("%s_activity_put_image_num_ops{role=\"%s\"} %g\n",
+		nameSpace, *role, s.NameNodeActivityInfo.PutImageNumOps)
+	ret += fmt.Sprintf("%s_activity_put_image_avg_time{role=\"%s\"} %g\n",
+		nameSpace, *role, s.NameNodeActivityInfo.PutImageAvgTime)
 
 	// JvmMetrics
-	ret += fmt.Sprintf("%s_jvm_metrics_gc_time_total_millis %g\n",
-		nameSpace, s.JvmMetricsInfo.GcTimeMillis)
-	ret += fmt.Sprintf("%s_jvm_metrics_gc_time_millis{type=\"par_new\"} %g\n",
-		nameSpace, s.JvmMetricsInfo.GcTimeMillisParNew)
-	ret += fmt.Sprintf("%s_jvm_metrics_gc_time_millis{type=\"concurrent_mark_sweep\"} %g\n",
-		nameSpace, s.JvmMetricsInfo.GcTimeMillisConcurrentMarkSweep)
-	ret += fmt.Sprintf("%s_jvm_metrics_gc_count_total %g\n",
-		nameSpace, s.JvmMetricsInfo.GcCount)
-	ret += fmt.Sprintf("%s_jvm_metrics_gc_count{type=\"par_new\"} %g\n",
-		nameSpace, s.JvmMetricsInfo.GcCountParNew)
-	ret += fmt.Sprintf("%s_jvm_metrics_gc_count{type=\"concurrent_mark_sweep\"} %g\n",
-		nameSpace, s.JvmMetricsInfo.GcCountConcurrentMarkSweep)
-	ret += fmt.Sprintf("%s_jvm_metrics_gc_threads_blocked %g\n",
-		nameSpace, s.JvmMetricsInfo.ThreadsBlocked)
+	ret += fmt.Sprintf("%s_jvm_metrics_gc_time_total_millis{role=\"%s\"} %g\n",
+		nameSpace, *role, s.JvmMetricsInfo.GcTimeMillis)
+	ret += fmt.Sprintf("%s_jvm_metrics_gc_time_millis{type=\"par_new\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.JvmMetricsInfo.GcTimeMillisParNew)
+	ret += fmt.Sprintf("%s_jvm_metrics_gc_time_millis{type=\"concurrent_mark_sweep\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.JvmMetricsInfo.GcTimeMillisConcurrentMarkSweep)
+	ret += fmt.Sprintf("%s_jvm_metrics_gc_count_total{role=\"%s\"} %g\n",
+		nameSpace, *role, s.JvmMetricsInfo.GcCount)
+	ret += fmt.Sprintf("%s_jvm_metrics_gc_count{type=\"par_new\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.JvmMetricsInfo.GcCountParNew)
+	ret += fmt.Sprintf("%s_jvm_metrics_gc_count{type=\"concurrent_mark_sweep\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.JvmMetricsInfo.GcCountConcurrentMarkSweep)
+	ret += fmt.Sprintf("%s_jvm_metrics_gc_threads_blocked{role=\"%s\"} %g\n",
+		nameSpace, *role, s.JvmMetricsInfo.ThreadsBlocked)
 
 	g_lock.Lock()
 	g_ret = ret

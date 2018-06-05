@@ -19,6 +19,7 @@ var (
 	listenAddress  = flag.String("unix-sock", "/dev/shm/hadoop_resourcemanager_exporter.sock", "Address to listen on for unix sock access and telemetry.")
 	metricsPath    = flag.String("web.telemetry-path", "/metrics", "Path under which to expose metrics.")
 	rmUrl = flag.String("rm.url", "http://localhost:8088", "Hadoop resource manager URL.")
+	role           = flag.String("role", "ResourceManager", "Role type.")
 )
 
 var g_doing bool
@@ -110,44 +111,44 @@ func doWork() {
 	ret := ""
 	nameSpace := "hadoop_resource_manager"
 
-	ret += fmt.Sprintf("%s_nodes{type=\"active\"} %g\n",
-		nameSpace, s.ActiveNodes)
-	ret += fmt.Sprintf("%s_nodes{type=\"rebooted\"} %g\n",
-		nameSpace, s.RebootedNodes)
-	ret += fmt.Sprintf("%s_nodes{type=\"decommissioned\"} %g\n",
-		nameSpace, s.DecommissionedNodes)
-	ret += fmt.Sprintf("%s_nodes{type=\"unhealthy\"} %g\n",
-		nameSpace, s.UnhealthyNodes)
-	ret += fmt.Sprintf("%s_nodes{type=\"lost\"} %g\n",
-		nameSpace, s.LostNodes)
-	ret += fmt.Sprintf("%s_nodes{type=\"total\"} %g\n",
-		nameSpace, s.TotalNodes)
+	ret += fmt.Sprintf("%s_nodes{type=\"active\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.ActiveNodes)
+	ret += fmt.Sprintf("%s_nodes{type=\"rebooted\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.RebootedNodes)
+	ret += fmt.Sprintf("%s_nodes{type=\"decommissioned\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.DecommissionedNodes)
+	ret += fmt.Sprintf("%s_nodes{type=\"unhealthy\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.UnhealthyNodes)
+	ret += fmt.Sprintf("%s_nodes{type=\"lost\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.LostNodes)
+	ret += fmt.Sprintf("%s_nodes{type=\"total\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.TotalNodes)
 
 
-	ret += fmt.Sprintf("%s_containers{type=\"allocated\"} %g\n",
-		nameSpace, s.ContainersAllocated)
-	ret += fmt.Sprintf("%s_containers{type=\"reserved\"} %g\n",
-		nameSpace, s.ContainersReserved)
-	ret += fmt.Sprintf("%s_containers{type=\"pending\"} %g\n",
-		nameSpace, s.ContainersPending)
+	ret += fmt.Sprintf("%s_containers{type=\"allocated\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.ContainersAllocated)
+	ret += fmt.Sprintf("%s_containers{type=\"reserved\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.ContainersReserved)
+	ret += fmt.Sprintf("%s_containers{type=\"pending\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.ContainersPending)
 
-	ret += fmt.Sprintf("%s_apps{type=\"killed\"} %g\n",
-		nameSpace, s.AppsKilled)
-	ret += fmt.Sprintf("%s_apps{type=\"failed\"} %g\n",
-		nameSpace, s.AppsFailed)
-	ret += fmt.Sprintf("%s_apps{type=\"running\"} %g\n",
-		nameSpace, s.AppsRunning)
-	ret += fmt.Sprintf("%s_apps{type=\"pending\"} %g\n",
-		nameSpace, s.AppsPending)
+	ret += fmt.Sprintf("%s_apps{type=\"killed\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.AppsKilled)
+	ret += fmt.Sprintf("%s_apps{type=\"failed\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.AppsFailed)
+	ret += fmt.Sprintf("%s_apps{type=\"running\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.AppsRunning)
+	ret += fmt.Sprintf("%s_apps{type=\"pending\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.AppsPending)
 
-	ret += fmt.Sprintf("%s_space{type=\"available\"} %g\n",
-		nameSpace, s.AvailableMB)
-	ret += fmt.Sprintf("%s_space{type=\"reserved\"} %g\n",
-		nameSpace, s.ReservedMB)
-	ret += fmt.Sprintf("%s_space{type=\"allocated\"} %g\n",
-		nameSpace, s.AllocatedMB)
-	ret += fmt.Sprintf("%s_space{type=\"total\"} %g\n",
-		nameSpace, s.TotalMB)
+	ret += fmt.Sprintf("%s_space{type=\"available\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.AvailableMB)
+	ret += fmt.Sprintf("%s_space{type=\"reserved\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.ReservedMB)
+	ret += fmt.Sprintf("%s_space{type=\"allocated\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.AllocatedMB)
+	ret += fmt.Sprintf("%s_space{type=\"total\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.TotalMB)
 
 
 	g_lock.Lock()

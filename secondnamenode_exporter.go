@@ -19,6 +19,7 @@ var (
 	listenAddress  = flag.String("unix-sock", "/dev/shm/hadoop_secondnamenode_exporter.sock", "Address to listen on for unix sock access and telemetry.")
 	metricsPath    = flag.String("web.telemetry-path", "/metrics", "Path under which to expose metrics.")
 	nameNodeJmxUrl = flag.String("jmx.url", "http://localhost:50090/jmx", "Hadoop second namenode JMX URL.")
+	role           = flag.String("role", "SecondaryNameNode", "Role type.")
 )
 
 var g_doing bool
@@ -113,31 +114,31 @@ func doWork() {
 	nameSpace := "hadoop_second_namenode"
 
 	// Memory
-	ret += fmt.Sprintf("%s_heap_memory{type=\"committed\"} %g\n",
-		nameSpace, s.MemoryInfo.heapMemoryUsageCommitted)
-	ret += fmt.Sprintf("%s_heap_memory{type=\"init\"} %g\n",
-		nameSpace, s.MemoryInfo.heapMemoryUsageInit)
-	ret += fmt.Sprintf("%s_heap_memory{type=\"max\"} %g\n",
-		nameSpace, s.MemoryInfo.heapMemoryUsageMax)
-	ret += fmt.Sprintf("%s_heap_memory{type=\"used\"} %g\n",
-		nameSpace, s.MemoryInfo.heapMemoryUsageUsed)
+	ret += fmt.Sprintf("%s_heap_memory{type=\"committed\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.MemoryInfo.heapMemoryUsageCommitted)
+	ret += fmt.Sprintf("%s_heap_memory{type=\"init\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.MemoryInfo.heapMemoryUsageInit)
+	ret += fmt.Sprintf("%s_heap_memory{type=\"max\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.MemoryInfo.heapMemoryUsageMax)
+	ret += fmt.Sprintf("%s_heap_memory{type=\"used\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.MemoryInfo.heapMemoryUsageUsed)
 
 
 	// JvmMetrics
-	ret += fmt.Sprintf("%s_jvm_metrics_gc_time_total_millis %g\n",
-		nameSpace, s.JvmMetricsInfo.GcTimeMillis)
-	ret += fmt.Sprintf("%s_jvm_metrics_gc_time_millis{type=\"par_new\"} %g\n",
-		nameSpace, s.JvmMetricsInfo.GcTimeMillisParNew)
-	ret += fmt.Sprintf("%s_jvm_metrics_gc_time_millis{type=\"concurrent_mark_sweep\"} %g\n",
-		nameSpace, s.JvmMetricsInfo.GcTimeMillisConcurrentMarkSweep)
-	ret += fmt.Sprintf("%s_jvm_metrics_gc_count_total %g\n",
-		nameSpace, s.JvmMetricsInfo.GcCount)
-	ret += fmt.Sprintf("%s_jvm_metrics_gc_count{type=\"par_new\"} %g\n",
-		nameSpace, s.JvmMetricsInfo.GcCountParNew)
-	ret += fmt.Sprintf("%s_jvm_metrics_gc_count{type=\"concurrent_mark_sweep\"} %g\n",
-		nameSpace, s.JvmMetricsInfo.GcCountConcurrentMarkSweep)
-	ret += fmt.Sprintf("%s_jvm_metrics_gc_threads_blocked %g\n",
-		nameSpace, s.JvmMetricsInfo.ThreadsBlocked)
+	ret += fmt.Sprintf("%s_jvm_metrics_gc_time_total_millis{role=\"%s\"} %g\n",
+		nameSpace, *role, s.JvmMetricsInfo.GcTimeMillis)
+	ret += fmt.Sprintf("%s_jvm_metrics_gc_time_millis{type=\"par_new\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.JvmMetricsInfo.GcTimeMillisParNew)
+	ret += fmt.Sprintf("%s_jvm_metrics_gc_time_millis{type=\"concurrent_mark_sweep\",role=\"%s\"} %g\n",
+		nameSpace, *role, s.JvmMetricsInfo.GcTimeMillisConcurrentMarkSweep)
+	ret += fmt.Sprintf("%s_jvm_metrics_gc_count_total{role=\"%s\"} %g\n",
+		nameSpace, *role, s.JvmMetricsInfo.GcCount)
+	ret += fmt.Sprintf("%s_jvm_metrics_gc_count{role=\"%s\",type=\"par_new\"} %g\n",
+		nameSpace, *role, s.JvmMetricsInfo.GcCountParNew)
+	ret += fmt.Sprintf("%s_jvm_metrics_gc_count{role=\"%s\",type=\"concurrent_mark_sweep\"} %g\n",
+		nameSpace, *role, s.JvmMetricsInfo.GcCountConcurrentMarkSweep)
+	ret += fmt.Sprintf("%s_jvm_metrics_gc_threads_blocked{role=\"%s\"} %g\n",
+		nameSpace, *role, s.JvmMetricsInfo.ThreadsBlocked)
 
 	g_lock.Lock()
 	g_ret = ret
