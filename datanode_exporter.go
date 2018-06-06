@@ -87,6 +87,8 @@ type DataNodeInfo struct {
 	GcCount float64
 	GcCountParNew float64
 	GcCountConcurrentMarkSweep float64
+	ThreadsBlocked float64
+	ThreadsWaiting float64
 }
 
 
@@ -189,6 +191,8 @@ func info() (DataNodeInfo, bool) {
 			ret.GcCount = nameDataMap["GcCount"].(float64)
 			ret.GcCountParNew = nameDataMap["GcCountParNew"].(float64)
 			ret.GcCountConcurrentMarkSweep = nameDataMap["GcCountConcurrentMarkSweep"].(float64)
+			ret.ThreadsBlocked = nameDataMap["ThreadsBlocked"].(float64)
+			ret.ThreadsWaiting = nameDataMap["ThreadsWaiting"].(float64)
 		}
 	}
 
@@ -208,7 +212,7 @@ func doWork() {
 	}
 
 	ret := ""
-	nameSpace := "hadoop_datanode"
+	nameSpace := "hadoop_"
 
 	ret += fmt.Sprintf("%s_heap_memory{type=\"committed\",role=\"%s\"} %g\n",
 		nameSpace, *role, s.HeapMemoryUsageCommitted)
@@ -322,6 +326,10 @@ func doWork() {
 		nameSpace, *role, s.GcCountParNew)
 	ret += fmt.Sprintf("%s_jvm_metrics_gc_count{type=\"concurrent_mark_sweep\",role=\"%s\"} %g\n",
 		nameSpace, *role, s.GcCountConcurrentMarkSweep)
+	ret += fmt.Sprintf("%s_jvm_metrics_gc_threads_blocked{role=\"%s\"} %g\n",
+		nameSpace, *role, s.ThreadsBlocked)
+	ret += fmt.Sprintf("%s_jvm_metrics_gc_threads_waiting{role=\"%s\"} %g\n",
+		nameSpace, *role, s.ThreadsWaiting)
 
 
 	g_lock.Lock()
